@@ -15,16 +15,14 @@ const { WebSocketServer } = require('ws')
 const wss = new WebSocketServer({ port: 6969 });
 
 wss.on('connection', function connection(ws) {
-  ws.on('message', function message(data) {
-    console.log('received: %s', data);
+	ws.on('message', function message(data) {
+		let response = JSON.parse(data)
+		console.log(response)
+	});
+});
 
-    ws.send("I received your message")
-  });
-
-  ws.send('Wow');
-  ws.send('Hello there');
-  ws.send('Have some more data');
-  ws.send('And some more');
+wss.on('close', function close() {
+	console.log("Client closed connection")
 });
 
 console.log("listening on port: " + process.env.PORT)
