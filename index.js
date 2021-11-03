@@ -17,9 +17,14 @@ const wss = new WebSocketServer({ port: 6969 });
 wss.on('connection', function connection(ws) {
   ws.on('message', function message(data) {
     console.log('received: %s', data);
+
+    ws.send("I received your message")
   });
 
-  ws.send('something');
+  ws.send('Wow');
+  ws.send('Hello there');
+  ws.send('Have some more data');
+  ws.send('And some more');
 });
 
 console.log("listening on port: " + process.env.PORT)
