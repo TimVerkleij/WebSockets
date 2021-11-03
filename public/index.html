@@ -8,8 +8,13 @@
 </head>
 <body>
     <p id="text">Hello</p>
+    <button onclick="hello()">Hello</button>
 </body>
 <script>
-    let webSocket = new WebSocket("wss://localhost:6969/idk");
+    let webSocket = new WebSocket("ws://localhost:6969");
+
+    function hello() {
+        webSocket.send("Hello")
+    }
 </script>
 </html>
