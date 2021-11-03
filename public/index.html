@@ -15,8 +15,9 @@
     </body>
     <script>
         let webSocket = new WebSocket("ws://localhost:6969")
-		let timer = {"isPaused": false}
-		currentTime = 0
+		let timer = {}
+		let isPaused = false
+		let currentTime
 
         function hello() {
             webSocket.send("Hello")
@@ -25,33 +26,47 @@
         function start() {
             timer.startTime = new Date().getTime()
 			timer.state = "Running"
-			let data = {currentTime, timer}
-            webSocket.send(JSON.stringify(data))
+			currentTime = new Date().getTime()
+            timer.id = setInterval(addSecond, 1000)
+
 
 			document.getElementById("start").setAttribute("disabled", true)
 			document.getElementById("pause").removeAttribute("disabled")
 			document.getElementById("stop").removeAttribute("disabled")
 
-            timer.id = setInterval(addSecond, 1000)
+            webSocket.send(JSON.stringify({currentTime, timer}))
         }
 
 		function pause() {
-			if(!timer.isPaused) {
+			if(!isPaused) {
 				clearInterval(timer.id)
 				timer.state = "Paused"
+				currentTime = new Date().getTime()
 				document.getElementById("pause").innerHTML = "Resume"
 				webSocket.send(JSON.stringify({currentTime, timer}))
-
 			} else {
 				timer.id = setInterval(addSecond, 1000)
 				timer.state = "Running"
+				currentTime = new Date().getTime()
+				timer.startTime = currentTime
 				document.getElementById("pause").innerHTML = "Pause"
 				webSocket.send(JSON.stringify({currentTime, timer}))
 			}
-			timer.isPaused = !timer.isPaused
+			isPaused = !isPaused
 		}
 
-		function stop() {}
+		function stop() {
+			clearInterval(timer.id)
+			timer.state = "Stopped"
+			currentTime = new Date().getTime()
+
+			document.getElementById("start").removeAttribute("disabled")
+			document.getElementById("pause").setAttribute("disabled" ,true)
+			document.getElementById("stop").removeAttribute("disabled" ,true)
+
+            document.getElementById("timer").innerHTML = 0
+			webSocket.send(JSON.stringify({currentTime, timer}))
+		}
 
         function addSecond() {
             let seconds = Number(document.getElementById("timer").innerHTML)
@@ -63,6 +78,5 @@
   			console.log(event.data)
 		};
 
-        function sendCurrentTime() {}
     </script>
 </html>

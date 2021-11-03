@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Server Sided</title>
+    </head>
+    <body>
+        <h1>0:00:00</h1>
+        <button id="start" onclick="start()">Start</button>
+        <button id="pause" onclick="pause()">Pause</button>
+        <button id="resume" onclick="resume()">Resume</button>
+        <button id="stop" onclick="stop()">Stop</button>
+    </body>
+    <script>
+        let webSocket = new WebSocket("ws://localhost:6969")
+        let clientID
+
+        webSocket.onmessage = function (event) {
+            console.log(event.data)
+            clientID = event.data
+        }
+
+        function start() {
+            let time = new Date().getTime()
+            let action = "Start"
+            webSocket.send(JSON.stringify({time, action, clientID}))
+        }
+
+        function pause() {
+            let time = new Date().getTime()
+            let action = "Pause"
+            webSocket.send(JSON.stringify({time, action, clientID}))
+        }
+
+        function resume() {
+            let time = new Date().getTime()
+            let action = "Resume"
+            webSocket.send(JSON.stringify({time, action, clientID}))
+        }
+
+        function stop() {
+            let time = new Date().getTime()
+            let action = "Stop"
+            webSocket.send(JSON.stringify({time, action, clientID}))
+        }
+    </script>
+</html>
