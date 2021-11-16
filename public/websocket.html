@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WebSocket</title>
+    </head>
+    <body>
+        <h1 id="timer">0</h1>
+        <button onclick="start()">Start</button>
+        <button onclick="stop()">Stop</button>
+        <button onclick="pause()">Pause</button>
+        <button onclick="resume()">Resume</button>
+        <h1>All timers will show here</h1>
+        <div id="timers"></div>
+    </body>
+    <script>
+        let webSocket
+
+        function start() {
+            webSocket = new WebSocket("ws://localhost:6969")
+
+            webSocket.onmessage = function (event) {
+                let response = JSON.parse(event.data)
+                document.getElementById("timer").innerHTML = `${response.timer}`
+                document.getElementById("timers").innerHTML = ""
+                response.timers.forEach(timer => {
+                    let text = document.createElement("h1")
+                    text.innerHTML = `Time: ${timer.seconds}`
+                    document.getElementById("timers").append(text)
+                });
+            }
+
+            webSocket.onclose = function (event) {
+                console.log("Websocket closed!")
+            }
+        }
+
+        function stop() {
+            webSocket.send(JSON.stringify({"action": "stop"}))
+        }
+
+        function pause() {
+            webSocket.send(JSON.stringify({"action": "pause"}))
+        }
+
+        function resume() {
+            webSocket.send(JSON.stringify({"action": "resume"}))
+        }
+    </script>
+</html>
