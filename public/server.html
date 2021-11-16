@@ -7,7 +7,7 @@
         <title>Server Sided</title>
     </head>
     <body>
-        <h1>0:00:00</h1>
+        <h1 id="clock">0:00:00</h1>
         <button id="start" onclick="start()">Start</button>
         <button id="pause" onclick="pause()">Pause</button>
         <button id="resume" onclick="resume()">Resume</button>
@@ -18,8 +18,40 @@
         let clientID
 
         webSocket.onmessage = function (event) {
-            console.log(event.data)
-            clientID = event.data
+            let response = JSON.parse(event.data)
+            clientID = response.clientID
+            console.log(response)
+            let clock = document.getElementById("clock")
+
+            if(!response.running) {
+                return
+            }
+            
+            let seconds = Math.floor(response.timer.currentTime / 1000)
+			let minutes = "00"
+			let hours = "0"
+            console.log(seconds)
+			if(seconds > 3600) {
+				let hours = Math.floor(seconds / 3600)
+                minutes = seconds % 3600
+                seconds = seconds % 60
+			}
+			if(seconds >= 60) {
+				minutes = Math.floor(seconds / 60)
+                console.log(minutes)
+				seconds = seconds % 60
+			}
+            if(!seconds) {
+                seconds = "00"
+            }
+            if(minutes.toString().length < 2) {
+                minutes = "0" + minutes
+            }
+            if(seconds.toString().length < 2) {
+                seconds = "0" + seconds
+            }
+            clock.innerHTML = `${hours}:${minutes}:${seconds}`
+            
         }
 
         function start() {
@@ -45,5 +77,6 @@
             let action = "Stop"
             webSocket.send(JSON.stringify({time, action, clientID}))
         }
+
     </script>
 </html>

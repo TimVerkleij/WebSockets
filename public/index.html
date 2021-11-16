@@ -15,9 +15,9 @@
     </body>
     <script>
         let webSocket = new WebSocket("ws://localhost:6969")
-		let timer = {}
-		let isPaused = false
-		let currentTime
+        let timer = {}
+        let isPaused = false
+        let currentTime
 
         function hello() {
             webSocket.send("Hello")
@@ -25,58 +25,67 @@
 
         function start() {
             timer.startTime = new Date().getTime()
-			timer.state = "Running"
-			currentTime = new Date().getTime()
+            timer.state = "Running"
+            currentTime = new Date().getTime()
             timer.id = setInterval(addSecond, 1000)
 
 
-			document.getElementById("start").setAttribute("disabled", true)
-			document.getElementById("pause").removeAttribute("disabled")
-			document.getElementById("stop").removeAttribute("disabled")
+            document.getElementById("start").setAttribute("disabled", true)
+            document.getElementById("pause").removeAttribute("disabled")
+            document.getElementById("stop").removeAttribute("disabled")
 
             webSocket.send(JSON.stringify({currentTime, timer}))
         }
 
-		function pause() {
-			if(!isPaused) {
-				clearInterval(timer.id)
-				timer.state = "Paused"
-				currentTime = new Date().getTime()
-				document.getElementById("pause").innerHTML = "Resume"
-				webSocket.send(JSON.stringify({currentTime, timer}))
-			} else {
-				timer.id = setInterval(addSecond, 1000)
-				timer.state = "Running"
-				currentTime = new Date().getTime()
-				timer.startTime = currentTime
-				document.getElementById("pause").innerHTML = "Pause"
-				webSocket.send(JSON.stringify({currentTime, timer}))
-			}
-			isPaused = !isPaused
-		}
+        function pause() {
+            if (! isPaused) {
+                clearInterval(timer.id)
+                timer.state = "Paused"
+                currentTime = new Date().getTime()
+                document.getElementById("pause").innerHTML = "Resume"
+                webSocket.send(JSON.stringify({currentTime, timer}))
+            } else {
+                timer.id = setInterval(addSecond, 1000)
+                timer.state = "Running"
+                currentTime = new Date().getTime()
+                timer.startTime = currentTime
+                document.getElementById("pause").innerHTML = "Pause"
+                webSocket.send(JSON.stringify({currentTime, timer}))
+            } isPaused = ! isPaused
+        }
 
-		function stop() {
-			clearInterval(timer.id)
-			timer.state = "Stopped"
-			currentTime = new Date().getTime()
+        function stop() {
+            clearInterval(timer.id)
+            timer.state = "Stopped"
+            currentTime = new Date().getTime()
 
-			document.getElementById("start").removeAttribute("disabled")
-			document.getElementById("pause").setAttribute("disabled" ,true)
-			document.getElementById("stop").removeAttribute("disabled" ,true)
+            document.getElementById("start").removeAttribute("disabled")
+            document.getElementById("pause").setAttribute("disabled", true)
+            document.getElementById("stop").removeAttribute("disabled", true)
 
             document.getElementById("timer").innerHTML = 0
-			webSocket.send(JSON.stringify({currentTime, timer}))
-		}
+            webSocket.send(JSON.stringify({currentTime, timer}))
+        }
 
         function addSecond() {
             let seconds = Number(document.getElementById("timer").innerHTML)
-			timer.currentTime = seconds++
+            timer.currentTime = seconds++
             document.getElementById("timer").innerHTML = seconds
         }
 
-		webSocket.onmessage = function (event) {
-  			console.log(event.data)
-		};
-
+        webSocket.onmessage = function (event) {
+            let seconds = Math.floor(event.data.currentTime / 1000)
+			let minutes = "00"
+			let hours = "00"
+			if(seconds > 3600) {
+				let hours = Math.floor(seconds / 3600)
+			}
+			if(seconds > 60) {
+				let minutes = Math.floor(seconds / 60)
+				if(minutes > 60) {
+					minutes = minutes % 60
+				}
+			}
+        };
     </script>
 </html>
